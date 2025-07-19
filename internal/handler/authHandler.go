@@ -6,6 +6,7 @@ import (
 
 	models "github.com/Project-ORDO/ORDO-backEnd/internal/model"
 	"github.com/Project-ORDO/ORDO-backEnd/internal/model/request"
+	"github.com/Project-ORDO/ORDO-backEnd/internal/model/response"
 	"github.com/Project-ORDO/ORDO-backEnd/internal/repository/implementations"
 	"github.com/Project-ORDO/ORDO-backEnd/internal/service"
 	"github.com/gin-gonic/gin"
@@ -45,8 +46,14 @@ func LoginHandler(c *gin.Context){
 		return
 	}
 
+	userResponse := response.UserResponse{
+		Email: user.Email,
+		Name:  user.Name, // use only if available
+	}
+
+
 	c.JSON(http.StatusOK,gin.H{
 		"message":"Login successful",
-		"user":user,
+		"user":userResponse,
 	})
 }
