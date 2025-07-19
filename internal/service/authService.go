@@ -6,6 +6,7 @@ import (
 	"time"
 
 	models "github.com/Project-ORDO/ORDO-backEnd/internal/model"
+	"github.com/Project-ORDO/ORDO-backEnd/internal/model/request"
 	interfaces "github.com/Project-ORDO/ORDO-backEnd/internal/repository/interface"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
@@ -45,4 +46,25 @@ func (s *UserService) SignUp(ctx context.Context, user *models.User) error {
 	user.IsActive = &active
 
 	return s.UserRepo.CreateUser(ctx, user)
+}
+
+func (s *UserService) LoginUser(ctx context.Context,req *request.LoginRequest) (*models.User,error){
+	user,err:=s.UserRepo.FindByEmail(ctx,req.Email)
+	if err!=nil || user==nil{
+		return nil,errors.New("user not found")
+	}
+
+	err= bcrypt.CompareHashAndPassword([]byte(user.Password),[]byte(req.Password))
+	if err!=nil{
+		return nil,errors.New("invalid credentials")
+	}
+
+	now :=time.Now()
+	err = s.UserRepo.UpdateUser(ctx,user.ID,map[string]interface{}{"lastlogin":now})
+	if err!=nil{
+		return nil,errors.New("could not update last login")
+	}
+	user.LastLogin = &now
+
+	return user,nil
 }
