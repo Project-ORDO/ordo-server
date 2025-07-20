@@ -12,48 +12,54 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SignUpHandler(c *gin.Context) {
-	var user models.User
-
-	if err := c.BindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
-		return
-	}
-
-	userService := service.NewUserService(implementations.NewUserRepo())
-
-	err := userService.SignUp(context.Background(), &user)
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+type AuthHandler struct {
+    userService *service.UserService
 }
 
-func LoginHandler(c *gin.Context){
-	var loginReq request.LoginRequest
+func NewAuthHandler() *AuthHandler {
+    return &AuthHandler{
+        userService: service.NewUserService(implementations.NewUserRepo()),
+    }
+}
 
-	if err:=c.ShouldBindJSON(&loginReq);err!=nil{
-		c.JSON(http.StatusBadRequest,gin.H{"error":"Invalid input"})
-		return
-	}
+func (h *AuthHandler) SignUp(c *gin.Context) {
+    var user models.User
 
-	userService:=service.NewUserService(implementations.NewUserRepo())
-	user,err:=userService.LoginUser(context.Background(),&loginReq)
-	if err!=nil{
-		c.JSON(http.StatusUnauthorized, gin.H{"error":err.Error()})
-		return
-	}
+    if err := c.BindJSON(&user); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid input"})
+        return
+    }
 
-	userResponse := response.UserResponse{
-		Email: user.Email,
-		Name:  user.Name, // use only if available
-	}
+    err := h.userService.SignUp(context.Background(), &user)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+        return
+    }
 
+    c.JSON(http.StatusOK, gin.H{"message": "User created successfully"})
+}
 
-	c.JSON(http.StatusOK,gin.H{
-		"message":"Login successful",
-		"user":userResponse,
-	})
+func (h *AuthHandler) Login(c *gin.Context) {
+    var loginReq request.LoginRequest
+
+    if err := c.ShouldBindJSON(&loginReq); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+        return
+    }
+
+    user, err := h.userService.LoginUser(context.Background(), &loginReq)
+    if err != nil {
+        c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+        return
+    }
+
+    userResponse := response.UserResponse{
+        Email: user.Email,
+        Name:  user.Name,
+    }
+
+    c.JSON(http.StatusOK, gin.H{
+        "message": "Login successful",
+        "user":    userResponse,
+    })
 }

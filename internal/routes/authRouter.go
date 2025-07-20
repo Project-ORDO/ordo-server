@@ -7,6 +7,8 @@ import (
 
 func AuthRoutes(rg *gin.RouterGroup){
 	auth := rg.Group("/auth")
-	auth.POST("/signup", handler.SignUpHandler)
-	auth.POST("/login",handler.LoginHandler)
+	authHandler := handler.NewAuthHandler()
+
+    auth.POST("/signup", authHandler.SignUp)
+    auth.POST("/login", authHandler.Login)
 }
