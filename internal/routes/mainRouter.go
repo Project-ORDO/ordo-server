@@ -5,7 +5,7 @@ import (
 )
 
 func SetupRoutes(r *gin.Engine) {
-    api := r.Group("/api")
+    api := r.Group("/api/v1")
     authRouter := NewAuthRouter()
     authRouter.RegisterRoutes(api)
 }
