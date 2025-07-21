@@ -5,10 +5,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuthRoutes(rg *gin.RouterGroup){
-	auth := rg.Group("/auth")
-	authHandler := handler.NewAuthHandler()
+type AuthRouter struct {
+    handler *handler.AuthHandler
+}
 
-    auth.POST("/signup", authHandler.SignUp)
-    auth.POST("/login", authHandler.Login)
+func NewAuthRouter() *AuthRouter {
+    return &AuthRouter{
+        handler: handler.NewAuthHandler(),
+    }
+}
+
+func (ar *AuthRouter) RegisterRoutes(rg *gin.RouterGroup) {
+    auth := rg.Group("/auth")
+    auth.POST("/signup", ar.handler.SignUp)
+    auth.POST("/login", ar.handler.Login)
 }
