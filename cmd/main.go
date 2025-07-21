@@ -1,6 +1,8 @@
 package main
 
 import (
+	"os"
+
 	"github.com/Project-ORDO/ORDO-backEnd/config"
 	"github.com/Project-ORDO/ORDO-backEnd/internal/routes"
 	"github.com/gin-gonic/gin"
@@ -16,5 +18,10 @@ func init() {
 
 func main() {
 	routes.SetupRoutes(r)
-	r.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	r.Run(":" + port)
+
 }
