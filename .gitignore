@@ -39,5 +39,3 @@ coverage.out
 *.tmp
 *.bak
 
-# Go module cache
-/go.sum
