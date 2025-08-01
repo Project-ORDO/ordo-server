@@ -85,5 +85,25 @@ func (r *userRepo) FindByEmail(ctx context.Context, email string) (*models.User,
 }
 
 // Helpers
-func ptrBool(b bool) *bool          { return &b }
+func ptrBool(b bool) *bool           { return &b }
 func ptrTime(t time.Time) *time.Time { return &t }
+
+func (r *userRepo) SaveVerification(ctx context.Context, verification *models.UserVerification) error {
+	collection := config.GetCollection("user_verifications")
+	_, err := collection.InsertOne(ctx, verification)
+	return err
+}
+
+func (r *userRepo) GetVerificationByToken(ctx context.Context, token string) (*models.UserVerification, error) {
+	collection := config.GetCollection("user_verifications")
+	var v models.UserVerification
+	err := collection.FindOne(ctx, bson.M{"token": token}).Decode(&v)
+	return &v, err
+}
+
+func (r *userRepo) DeleteVerificationByToken(ctx context.Context, token string) error {
+	collection := config.GetCollection("user_verifications")
+	_, err := collection.DeleteOne(ctx, bson.M{"token": token})
+	return err
+}
+
