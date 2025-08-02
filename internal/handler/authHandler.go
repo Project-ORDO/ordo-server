@@ -66,7 +66,7 @@ func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 		return
 	}
 
-	helper.Responce(c, http.StatusOK, "Email verified and account created", nil, "")
+	c.Redirect(http.StatusSeeOther, "http://localhost:8080/api/v1/auth/signup")
 }
 
 func (h *AuthHandler) Login(c *gin.Context) {
